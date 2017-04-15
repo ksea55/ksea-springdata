@@ -14,7 +14,7 @@ public class Person {
     private Integer id;
     private String lastName;
     private String email;
-    private Date brityday;
+    private Date birthday;
 
     public Person() {
     }
@@ -43,12 +43,12 @@ public class Person {
         this.email = email;
     }
 
-    public Date getBrityday() {
-        return brityday;
+    public Date getBirthday() {
+        return birthday;
     }
 
-    public void setBrityday(Date brityday) {
-        this.brityday = brityday;
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class Person {
                 "id=" + id +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", brityday=" + brityday +
+                ", birthday=" + birthday +
                 '}';
     }
 }

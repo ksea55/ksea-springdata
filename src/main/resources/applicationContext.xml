@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/data/jpa
+        http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+">
+    <context:annotation-config/>
+
+    <!--第一步-->
+
+    <!--加载数据源外置文件-->
+    <context:property-placeholder location="classpath:db.properties"/>
+    <!--配置c3p0数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driverClass}"></property>
+        <property name="jdbcUrl" value="${jdbc.url}"></property>
+        <property name="user" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+    <!--第二步：配置JPA的EntityManagerFactory-->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <!--注入数据源-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--配置JPA的实现适配器-->
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"></bean>
+        </property>
+        <!--配置JAP注解的扫描包-->
+        <property name="packagesToScan" value="org.ksea.springdata"></property>
+        <!--配置JPA的属性,其具体实现的ORM映射-->
+        <property name="jpaProperties">
+            <props>
+                <!--生成的数据库表的列字段属性的映射策略-->
+                <prop key="hibernate.ejb.naming_stragegy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+                <!--配置Hinbernate的基本属性-->
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop><!--配置Hibernate中的数据库方言-->
+                <prop key="hibernate.show_sql">true</prop> <!--是否显示sql输出-->
+                <prop key="hibernate.format_sql">true</prop><!--打印sql格式化-->
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--第三步：配置事务管理器-->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"></property>
+    </bean>
+
+    <!--第四步：配置支持注解的事务管理-->
+    <tx:annotation-driven transaction-manager="transactionManager"></tx:annotation-driven>
+
+
+    <!--第五部：配置SpringData  -->
+    <!--base-package="org.ksea.springdata" 主要扫描Repository Bean所在的包-->
+    <jpa:repositories base-package="org.ksea.springdata.*"
+                      entity-manager-factory-ref="entityManagerFactory"></jpa:repositories>
+</beans>

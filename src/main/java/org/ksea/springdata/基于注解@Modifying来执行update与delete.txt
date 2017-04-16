@@ -1,0 +1,39 @@
+在Spring data中执行其update与delete需要同时使用@Query与@Modifying两个注解
+注意：在Spring data中 JPQL不支持使用Insert语句，也就是不支持添加操作
+在update或者delete操作的时候需要使用事务，此时需要定义在Service中添加事务操作
+
+例如一下：
+
+//业务持久层操作
+@RepositoryDefinition(domainClass = Person.class, idClass = Integer.class)
+public interface PersonRepositoryToModifying {
+
+    @Modifying
+    @Query("update Person p set p.lastName=:lastName where p.id=:id")
+    void updatePersonById(@Param("lastName") String lastName, @Param("id") Integer id);
+
+    @Modifying
+    @Query("delete  from  Person p  where p.id=:id")
+    void deletePersonById(@Param("id") Integer id);
+
+}
+
+//业务层操作
+@Service
+public class PersonService {
+    @Autowired
+    private PersonRepositoryToModifying personRepositoryToModifying;
+
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
+    public void updatePersonLastNameById(String lastName, Integer id) {
+        personRepositoryToModifying.updatePersonById(lastName, id);
+    }
+
+
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
+    public void removePersonById(Integer id) {
+        personRepositoryToModifying.deletePersonById(id);
+    }
+
+}
+

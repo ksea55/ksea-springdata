@@ -1,15 +1,18 @@
 package org.ksea.springdata.test;
 
 import org.junit.Test;
+import org.ksea.springdata.dao.PersonCrudRepository;
 import org.ksea.springdata.dao.PersonRepository;
 import org.ksea.springdata.dao.PersonRepositoryToQuery;
 import org.ksea.springdata.model.Person;
 import org.ksea.springdata.service.PersonService;
+import org.ksea.springdata.service.PersonServiceToCrudRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -143,5 +146,32 @@ public class SpringDataTest {
 
         System.out.println("----------------------------------");
         personService.removePersonById(4);
+    }
+
+    @Test
+    public void batchAddPersonTest() {
+        PersonServiceToCrudRepository serviceToCrudRepository = applicationContext.getBean(PersonServiceToCrudRepository.class);
+        List<Person> personList = new ArrayList<Person>();
+        Person p1 = new Person();
+        p1.setBirthday(new Date());
+        p1.setEmail("p1@126.com");
+        p1.setLastName("p1");
+
+
+        Person p2 = new Person();
+        p2.setBirthday(new Date());
+        p2.setEmail("p2@126.com");
+        p2.setLastName("p2");
+
+
+        Person p3 = new Person();
+        p3.setBirthday(new Date());
+        p3.setEmail("p3@126.com");
+        p3.setLastName("p3");
+        personList.add(p1);
+        personList.add(p2);
+        personList.add(p3);
+
+        serviceToCrudRepository.batchAddPerson(personList);
     }
 }

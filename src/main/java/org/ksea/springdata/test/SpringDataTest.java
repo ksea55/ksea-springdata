@@ -5,6 +5,7 @@ import org.ksea.springdata.dao.PersonCrudRepository;
 import org.ksea.springdata.dao.PersonRepository;
 import org.ksea.springdata.dao.PersonRepositoryToQuery;
 import org.ksea.springdata.model.Person;
+import org.ksea.springdata.service.PersonPagingAndSortingRepositoryService;
 import org.ksea.springdata.service.PersonService;
 import org.ksea.springdata.service.PersonServiceToCrudRepository;
 import org.springframework.context.ApplicationContext;
@@ -173,5 +174,11 @@ public class SpringDataTest {
         personList.add(p3);
 
         serviceToCrudRepository.batchAddPerson(personList);
+    }
+
+    @Test
+    public void pageTest() {
+        PersonPagingAndSortingRepositoryService service = applicationContext.getBean(PersonPagingAndSortingRepositoryService.class);
+        service.findAll();
     }
 }

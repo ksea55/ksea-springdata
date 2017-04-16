@@ -16,6 +16,10 @@ public class Person {
     private String email;
     private Date birthday;
 
+    @JoinColumn(name = "addressId")
+    @ManyToOne //多对一
+    private  Address  address ;
+
     public Person() {
     }
 
@@ -49,6 +53,15 @@ public class Person {
 
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
+    }
+
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     @Override

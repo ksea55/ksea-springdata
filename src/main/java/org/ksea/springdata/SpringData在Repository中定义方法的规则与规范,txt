@@ -1,0 +1,123 @@
+SpringData在Repository中定义方法的规则与规范：
+一、简单条件查询
+
+     简单条件查询，是查询某一个实体类或者集合，按照Spring Data的规范，
+     查询方法以find 或者 read 或者 get开头，涉及条件查询时，条件的属性用条件关键字连接
+     要注意的是：条件属性以首字母大写
+
+ 例如：定义一个Entity实体类
+     class User{
+        private String firstName;
+        private String lastName;
+     }
+  使用And条件连接时，应该这样写:
+     findByLastNameAndFistName(String lastName,String firstName);
+     条件中的属性名称与个人要与参数的位置与个数一一对应
+
+
+
+  以下都是关键之方法举例:
+
+         Person getByLastName(String lastName);
+
+         //执行sql条件中 where id >1 and lastName ='hai'
+         Person findByIdGreaterThanAndLastName(Integer id, String lastName);
+
+         /*
+         * Spring data中like组合查询
+         * sql： where lastName like ?% and id< ?  lastName以什么开始进行模糊查询并且id小于某个介质
+         * */
+         List<Person> findByLastNameStartingWithAndIdLessThan(String lastName, Integer id);
+
+         /*
+          *
+           * sql"where lastName like %? and id <?  lastName以什么结尾进行模糊查询并且id小于某个介质
+          */
+         List<Person> findByLastNameEndingWithAndIdLessThan(String lastName, Integer id);
+
+         /*sql: where email in(?) or birtyday<   email邮箱在某个范围或者birthday生日小于某个时间范围 */
+         List<Person> findByEmailInOrBirthdayLessThan(List<String> email, Date birthday);
+
+         /*sql: where email in(?) and birtyday<   email邮箱在某个范围或者birthday生日小于某个时间范围 */
+         List<Person> findByEmailInAndBirthdayLessThan(List<String> email, Date birthday);
+
+
+
+
+
+  两张表中的级联关系查询 这里Person中的address属性就属于级联属性
+        @Entity
+        @Table(name = "JPA_PERSON")
+        public class Person {
+            @Id
+            @GeneratedValue
+            private Integer id;
+            private String lastName;
+            private String email;
+            private Date birthday;
+
+            @JoinColumn(name = "addressId")
+            @ManyToOne //多对一
+            private  Address  address ; //级联属性
+          }
+
+
+       @Table(name = "jpa_address")
+       @Entity
+       public class Address {
+
+           @GeneratedValue
+           @Id
+           private Integer id;
+           private String province;
+           private String city;
+
+            }
+
+
+          /*两张表中的级联查询
+          * 这里的addressId是我们Person中的一个类属性  private  Address addressId;
+          * 这里他会自动关联到 address表中
+          * 执行结果:
+              * Hibernate:
+              select
+                  person0_.id as id1_1_,
+                  person0_.addressId as addressI5_1_,
+                  person0_.birthday as birthday2_1_,
+                  person0_.email as email3_1_,
+                  person0_.lastName as lastName4_1_
+              from
+                  JPA_PERSON person0_
+              left outer join
+                  jpa_address address1_
+                      on person0_.addressId=address1_.id
+              where
+                  address1_.id>?
+          []
+
+          * */
+          List<Person> findByAddressIdGreaterThan(Integer addressId);
+
+
+        /*
+           * 当某个类中与级联属性的关联字段相同的情况下，其会优先使用该类中的字段
+           * 如 Person中也有一个String addressId的属性，在做查询的时候则会优先使用addressId，并会会抛出列重复的异常，
+           * 对于这种情况，Spring data推荐我们在使用级联属性的时候命名加上_
+           *
+           * 运行结果:Hibernate:
+           select
+               person0_.id as id1_1_,
+               person0_.addressId as addressI5_1_,
+               person0_.birthday as birthday2_1_,
+               person0_.email as email3_1_,
+               person0_.lastName as lastName4_1_
+           from
+               JPA_PERSON person0_
+           left outer join
+               jpa_address address1_
+                   on person0_.addressId=address1_.id
+           where
+               address1_.id>?
+       []
+           * */
+           List<Person> findByAddress_idGreaterThan(Integer addressId);

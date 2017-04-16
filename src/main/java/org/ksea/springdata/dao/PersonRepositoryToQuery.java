@@ -39,5 +39,9 @@ public interface PersonRepositoryToQuery {
     @Query("select p from Person p where p.lastName  like %:lastName%  and p.email like %:email%")
     List<Person> findByLike2(@Param("lastName") String lastName, @Param("email") String email);
 
+    /*基于本地sql的查询方法nativeQuery = true 表示调用本地sql*/
+    @Query(value = "select * from jpa_person p where p.lastname=:lastName and p.email=:email", nativeQuery = true)
+    Person findByLastNameAndEmailToNativeSQL(@Param("lastName") String lastName, @Param("email") String email);
+
 
 }

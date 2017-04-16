@@ -127,5 +127,11 @@ public class SpringDataTest {
         System.out.println("--------------------------------------------------------------------");
         persons = repositoryToQuery.findByLike2("ya", "aa");
         System.out.println(persons); //[Person{id=3, lastName='yang', email='aa@qq.com', birthday=2017-04-26 00:01:40.0}]
+
+        System.out.println("--------------------------------------------------------------------");
+
+         person = repositoryToQuery.findByLastNameAndEmailToNativeSQL("yang", "aa@qq.com");
+
+        System.out.println(person); //Person{id=3, lastName='yang', email='aa@qq.com', birthday=2017-04-26 00:01:40.0}
     }
 }

@@ -2,6 +2,7 @@ package org.ksea.springdata.test;
 
 import org.junit.Test;
 import org.ksea.springdata.dao.PersonRepository;
+import org.ksea.springdata.dao.PersonRepositoryToQuery;
 import org.ksea.springdata.model.Person;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -64,16 +65,16 @@ public class SpringDataTest {
 
 
         System.out.println("----------------------------------------------------");
-        persons = personRepository.findByEmailInOrBirthdayLessThan(Arrays.asList("aa@qq.com","bb@126.com"), new Date());
+        persons = personRepository.findByEmailInOrBirthdayLessThan(Arrays.asList("aa@qq.com", "bb@126.com"), new Date());
         System.out.println(persons); //[Person{id=1, lastName='haiyang', email='ksea@qq.com', birthday=2017-04-16 00:00:00.0}, Person{id=2, lastName='hai', email='mexican@qq.com', birthday=2017-04-16 00:01:17.0}, Person{id=4, lastName='kabc', email='bb@126.com', birthday=2017-04-04 00:01:57.0}]
 
         System.out.println("----------------------------------------------------");
-        persons = personRepository.findByEmailInAndBirthdayLessThan(Arrays.asList("aa@qq.com","bb@126.com"), new Date());
+        persons = personRepository.findByEmailInAndBirthdayLessThan(Arrays.asList("aa@qq.com", "bb@126.com"), new Date());
         System.out.println(persons); //[Person{id=4, lastName='kabc', email='bb@126.com', birthday=2017-04-04 00:01:57.0}]
 
 
         System.out.println("----------------------------------------------------");
-        persons=personRepository.findByAddressIdGreaterThan(2);
+        persons = personRepository.findByAddressIdGreaterThan(2);
         System.out.println(persons);
         /*
         * 这里会自动帮我们进行关联
@@ -96,10 +97,35 @@ public class SpringDataTest {
         * */
 
 
-
-
         System.out.println("----------------------------------------------------");
-        persons=personRepository.findByAddress_idGreaterThan(2);
+        persons = personRepository.findByAddress_idGreaterThan(2);
         System.out.println(persons);
+    }
+
+    /*基于注解@Query的查询*/
+    @Test
+    public void queryTest() {
+        PersonRepositoryToQuery repositoryToQuery = applicationContext.getBean(PersonRepositoryToQuery.class);
+        Person person = repositoryToQuery.findByMaxId();
+        System.out.println(person);  //Person{id=4, lastName='kabc', email='bb@126.com', birthday=2017-04-04 00:01:57.0}
+
+        System.out.println("--------------------------------------------------------------------");
+
+        List<Person> persons = repositoryToQuery.findByLastNameAndEmail("yang", "aa@qq.com");
+        System.out.println(persons);
+
+        System.out.println("--------------------------------------------------------------------");
+
+        persons = repositoryToQuery.findByLastNameAndEmail2("aa@qq.com", "yang");
+        System.out.println(persons);  //[Person{id=3, lastName='yang', email='aa@qq.com', birthday=2017-04-26 00:01:40.0}]
+
+        System.out.println("--------------------------------------------------------------------");
+        persons = repositoryToQuery.findByLike1("ya", "aa");
+        System.out.println(persons); //[Person{id=3, lastName='yang', email='aa@qq.com', birthday=2017-04-26 00:01:40.0}]
+
+
+        System.out.println("--------------------------------------------------------------------");
+        persons = repositoryToQuery.findByLike2("ya", "aa");
+        System.out.println(persons); //[Person{id=3, lastName='yang', email='aa@qq.com', birthday=2017-04-26 00:01:40.0}]
     }
 }
